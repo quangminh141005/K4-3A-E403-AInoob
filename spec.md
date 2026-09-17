@@ -258,4 +258,6 @@ Tên người phụ trách phải khớp `TEAMMATES.md`; không để `TBD` ở 
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
 | 2026-09-16 | Tạo Spec v1.0; khóa lát cắt, verifier và quality bar | Chuyển ý tưởng Track A thành yêu cầu triển khai/kiểm thử được |
+| 2026-09-17 | Cập nhật số liệu mining thật (13.494 turns, 28% no citation), 5 ca nguyên văn, kết quả đo Run 1 (24 cases) và phân công thành viên | Bổ sung bằng chứng chuẩn B và đo lường phục vụ mốc CP3 & CP4 |
+
 
