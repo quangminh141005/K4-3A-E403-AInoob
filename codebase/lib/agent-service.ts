@@ -1,8 +1,19 @@
+export type ClaimItem = {
+  text: string;
+  verdict: "SUPPORTED" | "PARTIAL" | "UNSUPPORTED" | "CONTRADICTED";
+  evidence_ids: string[];
+  reason: string;
+};
+
 export type AgentReply = {
   answer: string;
   status: "verified" | "partial" | "insufficient_evidence";
+  claims?: ClaimItem[];
   citations: Array<{ id: number; source: string; excerpt: string }>;
+  latency_ms?: number;
+  model_used?: string;
 };
+
 
 export async function askAgent(question: string): Promise<AgentReply> {
   try {

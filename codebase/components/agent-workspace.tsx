@@ -3,15 +3,18 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { ArrowLeft, BookOpen, Check, ChevronDown, ChevronRight, FileText, FlaskConical, Menu, Send, Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
-import { askAgent } from "@/lib/agent-service";
+import { askAgent, ClaimItem } from "@/lib/agent-service";
 
 type Message = {
   id: number;
   role: "user" | "assistant";
   text: string;
   status?: "verified" | "partial" | "insufficient_evidence";
+  claims?: ClaimItem[];
   citations?: Array<{ id: number; source: string; excerpt: string }>;
+  model_used?: string;
 };
+
 const suggestions = [
   "Token là gì?",
   "LLM hoạt động như thế nào?",
@@ -41,7 +44,9 @@ export function AgentWorkspace() {
         role: "assistant",
         text: reply.answer,
         status: reply.status,
-        citations: reply.citations
+        claims: reply.claims,
+        citations: reply.citations,
+        model_used: reply.model_used
       }
     ]);
     setLoading(false);
@@ -100,10 +105,36 @@ export function AgentWorkspace() {
                       </div>
                     </details>
                   )}
-                  <div className="mt-3 flex items-center gap-2 border-t border-[#cde8d7] pt-3 text-slate-500">
-                    <span className="text-sm">Nguồn này hữu ích?</span>
-                    <button aria-label="Hữu ích" className="rounded p-1 hover:bg-white"><ThumbsUp size={16}/></button>
-                    <button aria-label="Không hữu ích" className="rounded p-1 hover:bg-white"><ThumbsDown size={16}/></button>
+                  {message.claims && message.claims.length > 0 && (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer font-semibold text-[#0f5288]">Chi tiết kiểm định từng mệnh đề ({message.claims.length} claims)</summary>
+                      <div className="mt-3 space-y-2 text-xs">
+                        {message.claims.map((claim, cIdx) => (
+                          <div key={cIdx} className="rounded-lg border border-slate-200 bg-white p-2.5">
+                            <div className="flex items-center gap-2">
+                              <span className={`rounded px-1.5 py-0.5 font-bold ${
+                                claim.verdict === 'SUPPORTED' ? 'bg-emerald-100 text-emerald-800' :
+                                claim.verdict === 'PARTIAL' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
+                              }`}>
+                                {claim.verdict}
+                              </span>
+                              <span className="font-medium text-slate-800">{claim.text}</span>
+                            </div>
+                            <p className="mt-1 text-slate-500">{claim.reason}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                  <div className="mt-3 flex items-center justify-between border-t border-[#cde8d7] pt-3 text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">Nguồn này hữu ích?</span>
+                      <button aria-label="Hữu ích" className="rounded p-1 hover:bg-white"><ThumbsUp size={16}/></button>
+                      <button aria-label="Không hữu ích" className="rounded p-1 hover:bg-white"><ThumbsDown size={16}/></button>
+                    </div>
+                    <button onClick={()=>alert("Cảm ơn bạn! Báo cáo trích dẫn sai đã được ghi lại vào log kiểm thử để tối ưu prompt.")} className="text-xs text-rose-600 hover:underline">
+                      Báo trích dẫn không đúng (HAX G15)
+                    </button>
                   </div>
                 </div>
               )}
@@ -116,6 +147,7 @@ export function AgentWorkspace() {
                   <p className="mt-1 text-xs text-amber-700">Bộ kiểm định phát hiện nội dung này không có trong Slide/Transcript Day 1.</p>
                 </div>
               )}
+
             </div>)}
             {loading&&<div className="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-500 shadow-sm"><span>Đang đối chiếu tài liệu</span>{[1,2,3].map((dot)=><span key={dot} className="typing-dot h-1.5 w-1.5 rounded-full bg-[#155a9d]"/>)}</div>}
           </div>

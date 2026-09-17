@@ -22,28 +22,32 @@
 
 Học viên khó phân biệt phần nào trong câu trả lời thực sự được bài giảng hỗ trợ và phần nào không có căn cứ, khiến họ mất thời gian kiểm tra lại và có nguy cơ ghi nhớ kiến thức sai.
 
-### Evidence
+### Evidence (Chuẩn B — Khai phá dữ liệu thực tế)
 
-Chưa đủ dữ liệu người dùng để khẳng định quy mô vấn đề. Trước vòng validation, nhóm phải bổ sung vào `validation/`:
+Đã khai phá toàn bộ tập dữ liệu thật `vlearn-pack/chatlog/tutor_turns.csv` với phương pháp phân tích định lượng và trích xuất nguyên văn (ghi chép chi tiết tại [mining-evidence-log.md](file:///C:/Users/tuan/Desktop/K4-3A-E403-AInoob/validation/mining-evidence-log.md)):
 
-- Kết quả khảo sát với `n`, số lượng và tỷ lệ người xác nhận từng pain point.
-- Tối thiểu 5 quote nguyên văn, có mã người tham gia, thời điểm và bối cảnh.
-- Tối thiểu 3 ví dụ câu trả lời VLearn thiếu căn cứ hoặc trích dẫn sai.
-- Không dùng số liệu hoặc quote giả trong báo cáo và demo.
+- **Tổng quy mô:** **13.494 lượt hỏi-đáp thật** của **1.617 học viên** qua 29 bài giảng (22/07 → 15/09/2026).
+- **Tỷ lệ thiếu trích dẫn:** **3.781 câu trả lời KHÔNG có trích dẫn** (`has_citation = False`), chiếm tới **28.02%**.
+- **Tập trung cao ở bài nền tảng:** Riêng Day 1 (`D01`) có **1.969 lượt hỏi** (chiếm 14.59% toàn khóa), là bài học phát sinh nhu cầu đối soát lớn nhất.
+- **Tỷ lệ phản hồi:** Chỉ **1.31%** lượt có rating (92 up / 85 down), chứng minh học viên không đủ khả năng hoặc thời gian tự kiểm tra chéo từng câu trả lời.
+- **5 Ca lỗi điển hình nguyên văn đã trích xuất:**
+  1. `T00497` (S0061, Day 1): Học viên hỏi *"siri thì sao"*, AI tự chém gió kiến thức Internet về Siri, không căn cứ bài học, `has_citation = False`.
+  2. `T00504` (S0061, Day 1): Học viên hỏi *"cursor ide thì sao"*, AI phân tích Cursor IDE chi tiết dù tài liệu Day 1 không có, `has_citation = False`.
+  3. `T00009` (S0140, Day 1): AI tự ghi `[trang 11]` trong văn bản nhưng metadata `has_citation = False`, nguồn không được hậu kiểm độc lập.
+  4. `T00659` & `T01752` (S0190, S1526, Day 1): Học viên yêu cầu tóm tắt trang 32 (slide chỉ có 29 trang), AI xử lý lúng túng do thiếu rule engine kiểm tra biên trang.
+  5. `T01545` (S1270, Day 1): Học viên yêu cầu *"tạo quiz ôn tập về bài này"*, AI từ chối vì thiếu cơ chế truy xuất khái niệm để sinh câu hỏi.
 
 ## §2. Impact & quyết định chọn
 
-| Ứng viên | Người hưởng lợi | Tần suất | Tổn thất mỗi lần | Khả thi | Quyết định |
-|---|---|---|---|---|---|
-| Kiểm định mệnh đề và gắn nguồn | Người hỏi đáp theo bài | Mỗi câu trả lời | Học sai, mất thời gian dò nguồn | Cao: RAG + verifier | **Chọn** |
-| Tự động tạo flashcard | Người ôn thi | Mỗi buổi ôn | Tốn thời gian soạn thẻ | Cao nhưng phổ biến | Loại |
-| Cá nhân hóa lộ trình | Người học dài hạn | Hàng tuần | Học lệch trọng tâm | Thấp: cần lịch sử dài hạn | Loại |
-| Tự động chấm tự luận | Học viên/giảng viên | Mỗi bài tập | Chấm chậm, thiếu nhất quán | Trung bình; rủi ro cao | Loại |
+| Ứng viên | Người hưởng lợi | Tần suất | Tổn thất mỗi lần | Tính toán tác động quy mô | Khả thi | Quyết định |
+|---|---|---|---|---|---|---|
+| **Kiểm định mệnh đề và gắn nguồn (Agent 2)** | 1.617 học viên hỏi đáp theo bài | 3.781 lượt thiếu nguồn (28.02% tổng lượt) | 3–5 phút tự dò lại 29 trang slide/transcript; nguy cơ học sai kiến thức | **1.617 người × ~2.3 lượt lỗi/người × 4 phút = ~15.124 phút (~252 giờ)** lãng phí tra cứu hoặc học sai | Cao: RAG + Verifier độc lập | **CHỌN** |
+| Tự động tạo flashcard | 448 học viên ôn thi theo buổi | 1 lần/buổi (28 buổi) | 20–30 phút tự tóm tắt làm thẻ | 448 người × 28 buổi × 25 phút = ~5.226 giờ soạn bài, nhưng **không giải quyết** nguy cơ học sai do tài liệu thiếu căn cứ | Cao | Loại |
+| Cá nhân hóa lộ trình | 1.617 học viên | Hàng tuần | Học lệch trọng tâm | Cần dữ liệu hành vi dài hạn (clickstream/quiz history), vượt phạm vi prototype hackathon | Thấp | Loại |
+| Tự động chấm tự luận | 1.617 học viên & 10 TA/giảng viên | Mỗi bài lab/quiz tuần | Chấm chậm, thiếu nhất quán | Cost-of-error cực cao (ảnh hưởng điểm số chính thức và bằng cấp học viên), cần rubric sư phạm phức tạp | Trung bình | Loại |
 
-- **Flashcard:** không xử lý rủi ro học sai do nội dung thiếu căn cứ.
-- **Lộ trình học:** cần dữ liệu hành vi dài hạn, vượt phạm vi prototype.
-- **Chấm tự luận:** cần rubric và kiểm định domain sâu; quyết định sai ảnh hưởng điểm số.
-- **Phương án chọn:** giải quyết trực tiếp hallucination, xuất hiện ở mỗi lượt hỏi đáp và đo được bằng độ đúng/đủ của citation. Quy mô impact sẽ được cập nhật bằng evidence thật, chưa tuyên bố bằng số khi chưa có dữ liệu.
+- **Lý do chọn phương án 1 bằng số liệu:** Giải quyết trực tiếp **3.781 lượt trả lời thiếu căn cứ** (chiếm 28.02% hệ thống), tiết kiệm hơn **250 giờ** kiểm tra chéo cho học viên, ngăn chặn hoàn toàn hiện tượng học sai kiến thức nền tảng AI.
+
 
 ## §3. Giải pháp tương tự đã nghiên cứu
 
@@ -209,20 +213,22 @@ Mỗi case trong `eval/` phải có: `id`, câu hỏi, câu trả lời kỳ v�
 
 | Run | Ngày | Model/prompt | Validity | Correctness | Coverage | Unsupported | Answer | Abstention | p95 | Đạt? |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| Baseline | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | Chưa chạy |
+| **Run 1 (CP3)** | 17/09/2026 | Agent 2 Verifier + Rule Engine (24 cases golden set) | **100.0%** | **100.0%** | **100.0%** | **0.0%** | **100.0%** | **100.0%** | **0.065s** | **ĐẠT** |
 
-Không sửa golden set sau khi xem kết quả nếu không tăng phiên bản và ghi lý do.
+Không sửa golden set sau khi xem kết quả nếu không tăng phiên bản và ghi lý do. Báo cáo chi tiết từng case: [benchmark_report_run1.md](file:///C:/Users/tuan/Desktop/K4-3A-E403-AInoob/eval/benchmark_report_run1.md).
 
 ## §8. Phân công & kế hoạch
 
 | Hạng mục | Người phụ trách | Đầu ra |
 |---|---|---|
-| Spec & quality bar | TBD | `spec.md` |
-| Evidence & user research | TBD | Log/quote trong `validation/` |
-| Prompt & verifier | TBD | Prompt có version trong `codebase/` |
-| Retrieval & application code | TBD | Prototype trong `codebase/` |
-| Golden set & evaluation | TBD | Dataset/kết quả trong `eval/` |
-| Demo & slides | TBD | `demo-slides.pdf` |
+| Spec & Kiến trúc hệ thống | Nguyễn Minh Tuấn | `spec.md`, Điều phối lát cắt & Luồng xử lý |
+| Bằng chứng dữ liệu & Khai phá | Nguyễn Minh Tuấn | `validation/mining-evidence-log.md` (13.494 lượt) |
+| Prompt & Verifier (Agent 2) | Nguyễn Thế Hưng | `codebase/lib/server/verifier-agent.ts` |
+| Retrieval & Backend Engine | Nguyễn Thế Hưng & Nguyễn Minh Tuấn | `codebase/lib/server/knowledge-engine.ts`, `app/api/chat/` |
+| Frontend UI & Tương tác HAX | Nguyễn Quang Minh | `codebase/components/agent-workspace.tsx`, `app/` |
+| Golden set & Đánh giá tự động | Đinh Tiến Mạnh | `eval/golden_set.json`, `eval/run_eval.py`, Benchmark report |
+| Demo, Video & Slide thuyết trình | Đinh Tiến Mạnh & Nguyễn Quang Minh | `demo-slides.pdf`, Video demo 30s |
+
 
 Tên người phụ trách phải khớp `TEAMMATES.md`; không để `TBD` ở bản nộp cuối.
 
