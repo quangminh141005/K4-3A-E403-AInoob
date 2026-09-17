@@ -68,6 +68,16 @@ Frontend không nên gọi trực tiếp model AI. Mọi yêu cầu AI đi qua `
 
 ## Phân chia công việc
 
+| Việc cần làm | File/thư mục |
+|---|---|
+| Tạo prompt/system instruction | `codebase/prompts/` hoặc file backend |
+| Gọi Gemini/OpenAI/model khác | Backend trong `codebase/` |
+| Xử lý output | Backend trong `codebase/` |
+| Hiện kết quả trong UI | Frontend trong `codebase/` |
+| Lưu trace/log mẫu | `eval/traces/` |
+| Mô tả AI call | `codebase/README.md` |
+| Ghi phần thật và mock | `spec.md §` |
+
 Không cần tách thành hai dự án riêng. Frontend và backend có thể cùng nằm trong dự án Next.js này.
 
 - **Frontend:** làm việc trong `app/`, `components/` và `lib/agent-service.ts`.
