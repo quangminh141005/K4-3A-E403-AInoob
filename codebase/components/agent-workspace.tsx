@@ -5,9 +5,22 @@ import { FormEvent, useState } from "react";
 import { ArrowLeft, BookOpen, Check, ChevronDown, ChevronRight, FileText, FlaskConical, Menu, Send, Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { askAgent } from "@/lib/agent-service";
 
-type Message = { id: number; role: "user" | "assistant"; text: string };
-const suggestions = ["LLM hoạt động như thế nào?","Token là gì?","Giải thích cơ chế attention"];
-const firstMessage: Message = { id: 1, role: "assistant", text: "Chào Minh! Mình có thể giúp bạn tìm hiểu nội dung Day 1. Câu trả lời sẽ được đối chiếu với slide và transcript của bài học." };
+type Message = {
+  id: number;
+  role: "user" | "assistant";
+  text: string;
+  status?: "verified" | "partial" | "insufficient_evidence";
+  citations?: Array<{ id: number; source: string; excerpt: string }>;
+};
+const suggestions = [
+  "Token là gì?",
+  "LLM hoạt động như thế nào?",
+  "Giải thích cơ chế attention",
+  "Hallucination là gì?",
+  "Temperature có ý nghĩa gì?",
+  "Context window là gì?"
+];
+const firstMessage: Message = { id: 1, role: "assistant", text: "Chào bạn! Mình có thể giúp bạn tìm hiểu nội dung Day 1. Câu trả lời sẽ được đối chiếu với slide và transcript của bài học." };
 
 export function AgentWorkspace() {
   const [messages,setMessages] = useState<Message[]>([firstMessage]);
@@ -21,9 +34,19 @@ export function AgentWorkspace() {
     setMessages((current)=>[...current,{ id: Date.now(), role: "user", text: question.trim() }]);
     setInput(""); setLoading(true);
     const reply = await askAgent(question);
-    setMessages((current)=>[...current,{ id: Date.now()+1, role: "assistant", text: reply.answer }]);
+    setMessages((current)=>[
+      ...current,
+      {
+        id: Date.now()+1,
+        role: "assistant",
+        text: reply.answer,
+        status: reply.status,
+        citations: reply.citations
+      }
+    ]);
     setLoading(false);
   }
+
   function submit(event: FormEvent) { event.preventDefault(); void send(input); }
 
   return <main className="flex min-h-screen flex-col bg-white text-[#292d32]">
@@ -46,8 +69,53 @@ export function AgentWorkspace() {
           <div className="mb-6 flex items-start gap-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#155a9d] text-white"><Sparkles size={22}/></span><div><h2 className="text-2xl font-extrabold">Trợ lý học tập Day 1</h2><p className="mt-1 text-slate-600">Hỏi về nội dung trong slide và transcript của bài học.</p></div></div>
           <div className="flex-1 space-y-5" aria-live="polite">
             {messages.map((message,index)=><div key={message.id} className={message.role==="user"?"ml-auto max-w-[80%]":"max-w-[92%]"}>
-              <div className={message.role==="user"?"rounded-2xl rounded-br-sm bg-[#155a9d] px-4 py-3 leading-7 text-white":"rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-5 py-4 leading-7 shadow-sm"}>{message.text}{message.role==="assistant"&&index>0&&<><button className="ml-1 inline-flex h-6 min-w-6 items-center justify-center rounded bg-[#e8f3ec] px-1.5 align-middle text-sm font-bold text-[#137044]">1</button><button className="ml-1 inline-flex h-6 min-w-6 items-center justify-center rounded bg-[#e8f3ec] px-1.5 align-middle text-sm font-bold text-[#137044]">2</button></>}</div>
-              {message.role==="assistant"&&index>0&&<div className="mt-2 rounded-xl border border-[#b9dfc8] bg-[#f1fbf5] p-4"><div className="flex items-center gap-2 font-bold text-[#116b40]"><span className="grid h-6 w-6 place-items-center rounded-full bg-[#137044] text-white"><Check size={15}/></span>Đã kiểm định từ tài liệu</div><details className="mt-3"><summary className="cursor-pointer font-semibold text-[#155a9d]">Xem 2 nguồn trích dẫn</summary><div className="mt-3 space-y-2 text-sm text-slate-700"><p><b>[1] Slide Day 1 · Trang 12</b><br/>LLM dự đoán token tiếp theo dựa trên chuỗi token trước đó.</p><p><b>[2] Transcript · T04-041</b><br/>Attention giúp mô hình cân nhắc các phần khác nhau của ngữ cảnh.</p></div></details><div className="mt-3 flex items-center gap-2 border-t border-[#cde8d7] pt-3 text-slate-500"><span className="text-sm">Nguồn này hữu ích?</span><button aria-label="Hữu ích" className="rounded p-1 hover:bg-white"><ThumbsUp size={16}/></button><button aria-label="Không hữu ích" className="rounded p-1 hover:bg-white"><ThumbsDown size={16}/></button></div></div>}
+              <div className={message.role==="user"?"rounded-2xl rounded-br-sm bg-[#155a9d] px-4 py-3 leading-7 text-white":"rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-5 py-4 leading-7 shadow-sm"}>
+                {message.text}
+                {message.role==="assistant" && message.citations && message.citations.length > 0 && (
+                  <span className="ml-1 inline-flex gap-1">
+                    {message.citations.map((c, i) => (
+                      <button key={c.id || i} className="inline-flex h-6 min-w-6 items-center justify-center rounded bg-[#e8f3ec] px-1.5 align-middle text-sm font-bold text-[#137044]">
+                        {i + 1}
+                      </button>
+                    ))}
+                  </span>
+                )}
+              </div>
+              {message.role==="assistant" && index > 0 && message.status === "verified" && (
+                <div className="mt-2 rounded-xl border border-[#b9dfc8] bg-[#f1fbf5] p-4">
+                  <div className="flex items-center gap-2 font-bold text-[#116b40]">
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-[#137044] text-white"><Check size={15}/></span>
+                    Đã kiểm định từ tài liệu bài học (Agent 2 Verified)
+                  </div>
+                  {message.citations && message.citations.length > 0 && (
+                    <details className="mt-3" open>
+                      <summary className="cursor-pointer font-semibold text-[#155a9d]">Xem {message.citations.length} nguồn trích dẫn</summary>
+                      <div className="mt-3 space-y-2 text-sm text-slate-700">
+                        {message.citations.map((c, idx) => (
+                          <p key={c.id || idx}>
+                            <b>[{idx + 1}] {c.source}</b><br/>
+                            {c.excerpt}
+                          </p>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                  <div className="mt-3 flex items-center gap-2 border-t border-[#cde8d7] pt-3 text-slate-500">
+                    <span className="text-sm">Nguồn này hữu ích?</span>
+                    <button aria-label="Hữu ích" className="rounded p-1 hover:bg-white"><ThumbsUp size={16}/></button>
+                    <button aria-label="Không hữu ích" className="rounded p-1 hover:bg-white"><ThumbsDown size={16}/></button>
+                  </div>
+                </div>
+              )}
+              {message.role==="assistant" && index > 0 && message.status === "insufficient_evidence" && (
+                <div className="mt-2 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                  <div className="flex items-center gap-2 font-bold text-amber-800">
+                    <span>⚠️</span>
+                    Không đủ căn cứ trong bài học
+                  </div>
+                  <p className="mt-1 text-xs text-amber-700">Bộ kiểm định phát hiện nội dung này không có trong Slide/Transcript Day 1.</p>
+                </div>
+              )}
             </div>)}
             {loading&&<div className="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-500 shadow-sm"><span>Đang đối chiếu tài liệu</span>{[1,2,3].map((dot)=><span key={dot} className="typing-dot h-1.5 w-1.5 rounded-full bg-[#155a9d]"/>)}</div>}
           </div>
