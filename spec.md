@@ -226,11 +226,6 @@ Không sửa golden set sau khi xem kết quả nếu không tăng phiên bản 
 
 Tên người phụ trách phải khớp `TEAMMATES.md`; không để `TBD` ở bản nộp cuối.
 
-### Willing users và validation
-
-- Người dùng 1: **TBD** — thử happy path và case không đủ căn cứ.
-- Người dùng 2: **TBD** — kiểm tra khả năng hiểu/mở citation và correction.
-- Lưu task completion, lỗi quan sát, quote nguyên văn và thay đổi sau test trong `validation/`.
 
 ### Kế hoạch
 
