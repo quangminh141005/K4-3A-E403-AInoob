@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../vendor/shadcn-tailwind-4.13.0.css";
+
+:root { --background: #fff; --foreground: #272a2f; --primary: #155a9d; }
+* { box-sizing: border-box; }
+html { color-scheme: light; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+button, input, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+.brand-mark { width: 42px; height: 38px; display: inline-block; clip-path: polygon(0 0,50% 48%,100% 0,100% 48%,50% 100%,0 48%); background: linear-gradient(135deg,#cf202c 0 25%,#0c4f91 25% 100%); }
+.nav-link { position: relative; display: flex; height: 100%; align-items: center; gap: .55rem; font-weight: 700; white-space: nowrap; }
+.nav-link small { border-radius: 999px; background: #eef5fb; padding: .25rem .5rem; color: #155a9d; }
+.nav-link.active { color: #155a9d; }
+.nav-link.active::after { content: ""; position: absolute; inset: auto 0 -1px; height: 2px; background: #cf202c; }
+@keyframes pulse-dot { 0%,100% { opacity: .35; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-2px); } }
+.typing-dot { animation: pulse-dot 1s infinite; }
+.typing-dot:nth-child(2) { animation-delay: .15s; }
+.typing-dot:nth-child(3) { animation-delay: .3s; }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: .01ms !important; } }
