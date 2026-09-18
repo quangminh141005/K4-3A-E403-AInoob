@@ -17,7 +17,6 @@ function getDataPackDir(): string | null {
   }
 
   const possiblePaths = [
-    "C:\\Users\\tuan\\Desktop\\K4-3A-Day05-06-AI-Product-Hackathon\\data\\vlearn-pack",
     path.resolve(process.cwd(), "..", "..", "K4-3A-Day05-06-AI-Product-Hackathon", "data", "vlearn-pack"),
     path.resolve(process.cwd(), "..", "K4-3A-Day05-06-AI-Product-Hackathon", "data", "vlearn-pack")
   ];

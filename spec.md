@@ -1,6 +1,6 @@
 # AI SPEC — Bộ Kiểm Định Trích Dẫn Độc Lập · Nhóm AInoob · Zone E403
 
-**Hướng:** [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở  
+**Hướng:** [x] A — VLearn  
 **Loại:** [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới  
 **Phiên bản:** 1.0 — MVP Hackathon  
 **Trạng thái:** Đã khóa quality bar
@@ -24,7 +24,7 @@ Học viên khó phân biệt phần nào trong câu trả lời thực sự đ�
 
 ### Evidence (Chuẩn B — Khai phá dữ liệu thực tế)
 
-Đã khai phá toàn bộ tập dữ liệu thật `vlearn-pack/chatlog/tutor_turns.csv` với phương pháp phân tích định lượng và trích xuất nguyên văn (ghi chép chi tiết tại [mining-evidence-log.md](file:///C:/Users/tuan/Desktop/K4-3A-E403-AInoob/validation/mining-evidence-log.md)):
+Đã khai phá toàn bộ tập dữ liệu thật `vlearn-pack/chatlog/tutor_turns.csv` với phương pháp phân tích định lượng và trích xuất nguyên văn (ghi chép chi tiết tại [mining-evidence-log.md](./validation/mining-evidence-log.md)):
 
 - **Tổng quy mô:** **13.494 lượt hỏi-đáp thật** của **1.617 học viên** qua 29 bài giảng (22/07 → 15/09/2026).
 - **Tỷ lệ thiếu trích dẫn:** **3.781 câu trả lời KHÔNG có trích dẫn** (`has_citation = False`), chiếm tới **28.02%**.
@@ -215,7 +215,7 @@ Mỗi case trong `eval/` phải có: `id`, câu hỏi, câu trả lời kỳ v�
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | **Run 1 (CP3)** | 17/09/2026 | Agent 2 Verifier + Rule Engine (24 cases golden set) | **100.0%** | **100.0%** | **100.0%** | **0.0%** | **100.0%** | **100.0%** | **0.065s** | **ĐẠT** |
 
-Không sửa golden set sau khi xem kết quả nếu không tăng phiên bản và ghi lý do. Báo cáo chi tiết từng case: [benchmark_report_run1.md](file:///C:/Users/tuan/Desktop/K4-3A-E403-AInoob/eval/benchmark_report_run1.md).
+Không sửa golden set sau khi xem kết quả nếu không tăng phiên bản và ghi lý do. Báo cáo chi tiết từng case: [benchmark_report_run1.md](./eval/benchmark_report_run1.md).
 
 ## §8. Phân công & kế hoạch
 

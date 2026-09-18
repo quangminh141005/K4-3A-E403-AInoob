@@ -130,8 +130,8 @@ def run_pipeline(question):
         }
 
 def evaluate_golden_set():
-    golden_path = r"C:\Users\tuan\Desktop\K4-3A-E403-AInoob\eval\golden_set.json"
-    report_path = r"C:\Users\tuan\Desktop\K4-3A-E403-AInoob\eval\benchmark_report_run1.md"
+    golden_path = "eval/golden_set.json"
+    report_path = "eval/benchmark_report_run1.md"
     
     with open(golden_path, 'r', encoding='utf-8') as f:
         cases = json.load(f)
